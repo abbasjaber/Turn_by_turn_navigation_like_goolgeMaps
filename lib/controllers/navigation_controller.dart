@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -24,24 +23,29 @@ class NavigationController extends GetxController {
       accuracy: LocationAccuracy.high,
       distanceFilter: 1,
     );
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings)
-            .listen((Position? position)async{
-              LatLng newPosition = LatLng(position!.latitude, position.longitude);
-              homeController.addDriverMarker(LatLng(oldLatitude.value, oldLongitude.value), newPosition);
-              oldLatitude.value = position.latitude;
-              oldLongitude.value = position.longitude;
-             homeController.moveMapCamera(newPosition, zoom: 15.47, bearing: position.heading);
-             homeController.getTotalDistanceAndTime(homeController.destinationCoordinates);
-             bool isOnRoute = getRouteDeviation(newPosition);
-             if(!isOnRoute || directions.isEmpty){
-              await homeController.drawRoute(homeController.destinationCoordinates);
-              await getDirections(LatLng(position.latitude, position.longitude), homeController.destinationCoordinates);
-             }
-            getNextDirection(LatLng(position.latitude, position.longitude));
+    positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position? position) async {
+      LatLng newPosition = LatLng(position!.latitude, position.longitude);
+      homeController.addDriverMarker(
+          LatLng(oldLatitude.value, oldLongitude.value), newPosition);
+      oldLatitude.value = position.latitude;
+      oldLongitude.value = position.longitude;
+      homeController.moveMapCamera(newPosition,
+          zoom: 15.47, bearing: position.heading);
+      homeController
+          .getTotalDistanceAndTime(homeController.destinationCoordinates);
+      bool isOnRoute = getRouteDeviation(newPosition);
+      if (!isOnRoute || directions.isEmpty) {
+        await homeController.drawRoute(homeController.destinationCoordinates);
+        await getDirections(LatLng(position.latitude, position.longitude),
+            homeController.destinationCoordinates);
+      }
+      getNextDirection(LatLng(position.latitude, position.longitude));
     });
   }
 
-  stopNavigation()async{
+  stopNavigation() async {
     positionStream.cancel();
     homeController.mapStatus.value = Constants.route;
     homeController.positionCameraToRoute(homeController.polyline);
@@ -60,7 +64,7 @@ class NavigationController extends GetxController {
     return r;
   }
 
-    getDirections(LatLng from, LatLng to) async {
+  getDirections(LatLng from, LatLng to) async {
     String origin = "${from.latitude},${from.longitude}";
     String destinations = "${to.latitude},${to.longitude}";
     Dio dio = Dio();
@@ -78,7 +82,7 @@ class NavigationController extends GetxController {
     update();
   }
 
-    getNextDirection(LatLng from) {
+  getNextDirection(LatLng from) {
     if (directions.length > 1) {
       var closestDirectionIndex = directions.where((direction) =>
           SphericalUtils.computeDistanceBetween(

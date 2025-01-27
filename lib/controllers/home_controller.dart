@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:google_directions_api/google_directions_api.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -103,7 +102,7 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
         polylineCoordinates.clear();
         update();
       }
-      if(gettingRoute.value) return;
+      if (gettingRoute.value) return;
 
       gettingRoute.value = true;
 
@@ -138,10 +137,8 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       if (mapStatus.value != Constants.onDestination) {
         await positionCameraToRoute(polyline);
       }
-    } catch (e) {
-      
-    }finally{
-       gettingRoute.value = false;
+    } finally {
+      gettingRoute.value = false;
     }
   }
 
